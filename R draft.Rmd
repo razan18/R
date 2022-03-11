@@ -111,9 +111,13 @@ for (i in 1:length(unique(replaced_Chr_Maize$Chromosome))) {
 replaced_Teosinte <- as_tibble(lapply(join_teosinte, gsub, pattern ="?", replacement ="-", fixed = TRUE))
 replaced_Chr_Teosinte <- filter(replaced_Teosinte, Chromosome != "multiple" & Chromosome != "unknown")
 for (i in 1:length(unique(replaced_Chr_Teosinte$Chromosome))) {
-  chrm_subbed <- replaced_Chr_Teosinte %>% filter(Chromosome == i) %>% arrange(desc(Position))
+  chrt_replaced <- replaced_Chr_Teosinte %>% filter(Chromosome == i) %>% arrange(desc(Position))
   write.table(chrm_replaced, file = paste("./Teosinte_data/Teosinte_replaced_",i), quote = F, sep = "\t")
   } #teosinte data
 ```
 
 ## Data visualization
+
+
+
+
