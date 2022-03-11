@@ -1,0 +1,119 @@
+---
+title: "Razan R draft"
+author: "Razan Alsayed Omar"
+date: '2022-03-11'
+output: html_document
+---
+
+---
+title: "R assignment draft"
+author: "Razan Alsayed Omar"
+date: '2022-03-11'
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(data.table)
+```
+
+
+# Loading files
+```{r}
+genotypes <- read.table("fang_et_al_genotypes.txt", sep = "\t", header = T)
+snps <- read.table("snp_position.txt", sep = "\t", header = T )
+```
+## Data inspection
+# To look at rows and columns of the files (rows,columns)
+```{r}
+dim(genotypes)
+dim(snps)
+```
+# To look at the first 10 lines and first 10 headers
+```{r}
+genotypes[1:10,1:10]
+snps[1:10, 1:10]
+```
+# To look at the file format
+```{r}
+class(genotypes)
+class(snps)
+```
+## Data processing
+# To filter the genotypes files using Group column to match ZMM* for maize and ZMP* for teosinte and move it into a new file
+```{r}
+maize_genotypes <- filter(genotypes, Group == "ZMMIL" | Group == "ZMMLR" | Group == "ZMMMR")
+
+teosinte_genotypes <- filter(genotypes, Group == "ZMPBA" | Group == "ZMPIL" | Group == "ZMPJA")
+```
+
+# Prepare the snps file by extracting the columns we need (SNP_ID, chromosome, position), and sort based on snp position
+```{r}
+head(snps) #to check which column corresponds to the ones we want
+cutcol_snps <- snps [,c(1,3,4)] #to get columns 1,3,4 and move into a new file
+
+```
+# To remove the first 3 columns in the maize and teosinte files to transpose
+```{r}
+maize_genotypes_only <- maize_genotypes [,-c(1:3)]
+teosinte_genotypes_only <- teosinte_genotypes [,-c(1:3)]
+transposed_maize <- as.data.frame(t(maize_genotypes_only)) #to transpose maize genotypes
+transposed_teosinte <- as.data.frame(t(teosinte_genotypes_only)) #to transpose teosinte genotypes
+```
+
+# To join maize genotypes with snps, and teosinte genotypes with snps, based on SNP_ID
+```{r}
+join_maize <- cbind(cutcol_snps, transposed_maize)  
+join_teosinte <- cbind(cutcol_snps, transposed_teosinte)
+rownames(join_maize) <- NULL 
+rownames(join_teosinte) <- NULL
+```
+# To sort based on increasing snp position
+```{r}
+dir.create('./Maize_data') #to create a folder that will have all maize files
+chr_maize <- filter(join_maize, Chromosome != "multiple" & Chromosome != "unknown")
+for (i in 1:length(unique(chr_maize$Chromosome))){
+  chrm <-  chr_maize %>% filter(Chromosome == i) %>% arrange(Position)
+  write.table(chrm, file = paste("./Maize_data/Maize_chr_sorted_",i), quote = F, sep = "\t")
+} #sorting maize genotypes based on increasing snp position
+
+dir.create('./Teosinte_data') #to create a folder that will have all maize files
+chr_teosinte <- filter(join_teosinte, Chromosome != "multiple" & Chromosome != "unknown")
+for (i in 1:length(unique(chr_teosinte$Chromosome))) {
+  chrt <- chr_teosinte %>% filter(Chromosome == i) %>% arrange(Position)
+  write.table (chrt, file = paste("./Teosinte_data/Teosinte_chr_sorted_", i), quote = F, sep = "\t")
+} #sorting teosinte genotypes based on increasing snp position
+```
+# To sort in decreasing snp position
+```{r}
+chr_maize <- filter(join_maize, Chromosome != "multiple" & Chromosome != "unknown")
+for (i in 1:length(unique(chr_maize$Chromosome))){
+  chrm <-  chr_maize %>% filter(Chromosome == i) %>% arrange(desc(Position))
+  write.table(chrm, file = paste("./Maize_data/Maize_chr_decrease_",i), quote = F, sep = "\t")
+} #sorting maize genotypes based on decreasing snp position
+
+chr_teosinte <- filter(join_teosinte, Chromosome != "multiple" & Chromosome != "unknown")
+for (i in 1:length(unique(chr_teosinte$Chromosome))) {
+  chrt <- chr_teosinte %>% filter(Chromosome == i) %>% arrange(desc(Position))
+  write.table (chrt, file = paste("./Teosinte_data/Teosinte_chr_decrease_", i), quote = F, sep = "\t")
+} #sorting teosinte genotypes based on decreasing snp position
+```
+# Replacing "?" with "-" in decreasing maize and teosinte
+```{r}
+replaced_Maize <- as_tibble(lapply(join_maize, gsub, pattern ="?", replacement ="-", fixed = TRUE))
+replaced_Chr_Maize <- filter(replaced_Maize, Chromosome != "multiple" & Chromosome != "unknown")
+for (i in 1:length(unique(replaced_Chr_Maize$Chromosome))) {
+  chrm_replaced <- replaced_Chr_Maize %>% filter(Chromosome == i) %>% arrange(desc(Position))
+  write.table(chrm_replaced, file = paste("./Maize_data/Maize_replaced_",i), quote = F, sep = "\t")
+  } #maize data
+
+replaced_Teosinte <- as_tibble(lapply(join_teosinte, gsub, pattern ="?", replacement ="-", fixed = TRUE))
+replaced_Chr_Teosinte <- filter(replaced_Teosinte, Chromosome != "multiple" & Chromosome != "unknown")
+for (i in 1:length(unique(replaced_Chr_Teosinte$Chromosome))) {
+  chrm_subbed <- replaced_Chr_Teosinte %>% filter(Chromosome == i) %>% arrange(desc(Position))
+  write.table(chrm_replaced, file = paste("./Teosinte_data/Teosinte_replaced_",i), quote = F, sep = "\t")
+  } #teosinte data
+```
+
+## Data visualization
