@@ -118,6 +118,38 @@ for (i in 1:length(unique(replaced_Chr_Teosinte$Chromosome))) {
 
 ## Data visualization
 
+#SNPs per chromosome
 
+```{r}
+library(dplyr)
+library(reshape) 
+library(plyr)
+genotypest <- as.data.frame(t(genotypes))
+genotypesm.gg <- merge(genotypest, snps, by.x = "row.names", by.y = "SNP_ID") #transpose fang genotypes and snp position files
+genotypesm.gg$Chromosome <- factor(genotypesm.gg$Chromosome, levels = c("1","2","3","4","5","6","7","8","9","10"))
+ggplot(data = genotypesm.gg) + geom_bar(aes(genotypesm.gg$Chromosome)) + xlab("Chromosome Number") + ylab("SNPs") # Shows distribution of SNPs on and across chromosomes
+ggplot(data = genotypes, aes(Group)) + geom_bar() + xlab("Groups") + ylab("SNPs") #Shows SNPs position distribution in maize and teosinte - could be better if I could figure out how to just show maize and teosinte groups and not all
+
+```
+#Missing data and amount of heterozygosity
+
+```{r}
+Names <- colnames(genotypes)[-c(1:3)]
+genotypes.melt <- melt(genotypes, measure.vars = Names)
+colnames(genotypes.melt)[c(3,4,5)] <- c("Group","SNP_ID", "Allele") #Melting data to make it easier to work with
+genotypes.melt$Ho <- (genotypes.melt$Allele =="A/A" | genotypes.melt$Allele =="C/C" | genotypes.melt$Allele =="G/G" | genotypes.melt$Allele =="T/T")
+sortedmelt <- arrange(genotypes.melt, Sample_ID, Group)
+summarize.ID <- ddply(sortedmelt, c("Sample_ID"), summarise, total_ho = sum (Ho, na.rm=TRUE), total_het = sum (!Ho, na.rm=TRUE), missing = sum(is.na(Ho)))#Missing data and heterozygous ratio parameters
+summarize.melt <- melt(summarize.ID, measure.vars = c("total_ho", "total_het", "missing"))
+ggplot(summarize.melt,aes(x = Sample_ID, y = value, fill=variable)) + geom_bar(stat = "identity", position = "stack")
+attributes(summarize.melt)
+```
+
+#My own visualization
+
+```{r}
+chrpos.melt <- melt(snps, "Chromosome", "candidate.random") 
+ggplot(chrpos.melt)+geom_bar(aes(x=Chromosome, fill = value))+ggtitle("candidate versus random snps per chromosome")+labs(x = "chromosome", y ="snp_count")
+```
 
 
