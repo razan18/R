@@ -1,0 +1,23 @@
+---
+title: "Tyler Foster Review"
+author: "Tyler Foster"
+date: "3/18/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###################################################################################################################
+General thoughts:
+Your usage of loops is fantastic! You were able to complete the same procedures in just a few lines of code that took me large chunks of lines to complete! Outside of the first chunk of code where you upload the files, the R markdown runs flawlessly! I really liked your idea of creating a directory for the files and having them saved there. It's so much cleaner and I will have to implement that into my project! Your "on your own" idea of 'candidate' vs 'random' SNPs was really cool to see!
+
+Issue:
+1. Your code does not work. You read the files in from a location that does not include the files. Try loading the files in from the internet so that they will load into R.
+2. After applying an internet link to upload the files, it works.
+3. Something looks incorrect with your missing/heterozygosity/homozygosity figure. There are no missing values displayed!
+
+Overall, you did a great job! Please just make sure to change how you read the text file into R! *Hint: you can use the url found on github that you used for the unix assignment!* 
+
+###################################################################################################################
