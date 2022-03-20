@@ -1,0 +1,24 @@
+---
+title: "Review"
+author: "Ann Murithi"
+date: "3/18/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```
+My comments: 
+1. All your code run well to produce the expected files. 
+2. Good job with the file insepection. Your steps were cealry indicated for each file.
+3. For better data organization,I would suggest moving the output files to either the maize or teosinte folders. Although you created the two folders, not all the output went to their respective folders.
+4. In your visualization I was impressed with the candidate versus random snps per chromosome visualization. That was good
+4. Overall, your work was well done with every step clearly explained from file inspection, processing to visualization.
+
+Good job!
+```
+
+
